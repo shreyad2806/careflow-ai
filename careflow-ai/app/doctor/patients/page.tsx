@@ -9,9 +9,11 @@ import Button from '@/components/ui/Button';
 import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { doctorNavigation } from '@/lib/navigation';
 import { mockPatients, mockAppointments } from '@/lib/mock-data';
+import { getDemoDoctorName } from '@/lib/config/demo-identity';
 import { Phone, Calendar, Clock, FileText } from 'lucide-react';
 
 export default function DoctorPatients() {
+  const doctorName = getDemoDoctorName();
   const getPatientAppointments = (patientId: string) => {
     return mockAppointments.filter(a => a.patientId === patientId);
   };
@@ -20,7 +22,7 @@ export default function DoctorPatients() {
     <DashboardLayout
       navigation={doctorNavigation}
       role="doctor"
-      userName="Dr. Sarah Johnson"
+      userName={doctorName}
       headerTitle="Patients"
     >
       <PageHeader 

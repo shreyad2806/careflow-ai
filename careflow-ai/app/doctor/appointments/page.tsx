@@ -9,9 +9,11 @@ import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { doctorNavigation } from '@/lib/navigation';
 import { mockAppointments } from '@/lib/mock-data';
+import { getDemoDoctorName } from '@/lib/config/demo-identity';
 import { Calendar, Clock, Video, FileText } from 'lucide-react';
 
 export default function DoctorAppointments() {
+  const doctorName = getDemoDoctorName();
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
 
   const filteredAppointments = filter === 'all' 
@@ -24,7 +26,7 @@ export default function DoctorAppointments() {
     <DashboardLayout
       navigation={doctorNavigation}
       role="doctor"
-      userName="Dr. Sarah Johnson"
+      userName={doctorName}
       headerTitle="Appointments"
     >
       <PageHeader 

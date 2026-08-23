@@ -8,9 +8,11 @@ import Button from '@/components/ui/Button';
 import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { adminNavigation } from '@/lib/navigation';
 import { mockAppointments } from '@/lib/mock-data';
+import { getDemoAdminName } from '@/lib/config/demo-identity';
 import { Search } from 'lucide-react';
 
 export default function AdminAppointments() {
+  const adminName = getDemoAdminName();
   const [filterStatus, setFilterStatus] = useState<'all' | 'scheduled' | 'confirmed' | 'completed' | 'cancelled'>('all');
   const [filterUrgency, setFilterUrgency] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +41,7 @@ export default function AdminAppointments() {
     <DashboardLayout
       navigation={adminNavigation}
       role="admin"
-      userName="Admin User"
+      userName={adminName}
       headerTitle="All Appointments"
     >
       <PageHeader 

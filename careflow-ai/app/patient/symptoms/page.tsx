@@ -9,6 +9,7 @@ import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { patientNavigation } from '@/lib/navigation';
 import { BrainCircuit, Mic, ChevronRight, ChevronLeft, CheckCircle, AlertTriangle, Stethoscope } from 'lucide-react';
 import Link from 'next/link';
+import { getDemoPatientName } from '@/lib/config/demo-identity';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -32,6 +33,7 @@ const PROMPT_EXAMPLES = [
 ];
 
 export default function PatientSymptoms() {
+  const patientName = getDemoPatientName();
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -421,7 +423,7 @@ export default function PatientSymptoms() {
     <DashboardLayout
       navigation={patientNavigation}
       role="patient"
-      userName="John Smith"
+      userName={patientName}
       headerTitle="AI Symptom Check"
     >
       <div className="max-w-3xl mx-auto">

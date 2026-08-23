@@ -7,8 +7,10 @@ import CareTimeline from '@/components/app/CareTimeline';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { patientNavigation } from '@/lib/navigation';
 import { mockCareTimeline } from '@/lib/mock-data';
+import { getDemoPatientName } from '@/lib/config/demo-identity';
 
 export default function PatientTimeline() {
+  const patientName = getDemoPatientName();
   const completedEvents = mockCareTimeline.filter(e => e.status === 'completed');
   const upcomingEvents = mockCareTimeline.filter(e => e.status === 'upcoming' || e.status === 'pending');
 
@@ -16,7 +18,7 @@ export default function PatientTimeline() {
     <DashboardLayout
       navigation={patientNavigation}
       role="patient"
-      userName="John Smith"
+      userName={patientName}
       headerTitle="Care Timeline"
     >
       <PageHeader 

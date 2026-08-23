@@ -7,9 +7,11 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { adminNavigation } from '@/lib/navigation';
 import { mockLeaveRequests, mockAppointments, mockDoctors } from '@/lib/mock-data';
+import { getDemoAdminName } from '@/lib/config/demo-identity';
 import { Calendar, Clock, AlertTriangle, CheckCircle, XCircle, Mail, RefreshCw } from 'lucide-react';
 
 export default function AdminLeaves() {
+  const adminName = getDemoAdminName();
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -31,7 +33,7 @@ export default function AdminLeaves() {
     <DashboardLayout
       navigation={adminNavigation}
       role="admin"
-      userName="Admin User"
+      userName={adminName}
       headerTitle="Leave Management"
     >
       <PageHeader 

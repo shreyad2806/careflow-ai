@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { patientNavigation } from '@/lib/navigation';
 import { mockDoctors } from '@/lib/mock-data';
+import { getDemoPatientName } from '@/lib/config/demo-identity';
 import { Calendar, Clock, User, Languages, CheckCircle, AlertCircle, Timer } from 'lucide-react';
 
 const TIME_SLOTS = [
@@ -33,6 +34,7 @@ const getNext7Days = () => {
 
 export default function PatientBooking() {
   const router = useRouter();
+  const patientName = getDemoPatientName();
   const [selectedDoctor, setSelectedDoctor] = useState(mockDoctors[0]);
   const [selectedDate, setSelectedDate] = useState(getNext7Days()[0].date);
   const [selectedSlot, setSelectedSlot] = useState('');
@@ -78,7 +80,7 @@ export default function PatientBooking() {
 
   if (bookingConfirmed) {
     return (
-      <DashboardLayout navigation={patientNavigation} role="patient" userName="John Smith" headerTitle="Book Appointment">
+      <DashboardLayout navigation={patientNavigation} role="patient" userName={patientName} headerTitle="Book Appointment">
         <div className="max-w-2xl mx-auto">
           <Card className="border-2 border-green-200">
             <CardContent className="p-12 text-center">
@@ -98,7 +100,7 @@ export default function PatientBooking() {
   }
 
   return (
-    <DashboardLayout navigation={patientNavigation} role="patient" userName="John Smith" headerTitle="Book Appointment">
+    <DashboardLayout navigation={patientNavigation} role="patient" userName={patientName} headerTitle="Book Appointment">
       <PageHeader 
         title="Book an Appointment"
         subtitle="Select a doctor and choose your preferred time"

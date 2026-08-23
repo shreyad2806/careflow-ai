@@ -10,9 +10,11 @@ import UrgencyBadge from '@/components/app/UrgencyBadge';
 import CareTimeline from '@/components/app/CareTimeline';
 import { patientNavigation } from '@/lib/navigation';
 import { mockAppointments, mockCareTimeline } from '@/lib/mock-data';
+import { getDemoPatientName } from '@/lib/config/demo-identity';
 import { Calendar, Clock, User, FileText, Phone, Mail, AlertTriangle, CheckCircle, Video, CalendarPlus } from 'lucide-react';
 
 export default function AppointmentDetail() {
+  const patientName = getDemoPatientName();
   const params = useParams();
   const appointment = mockAppointments.find(a => a.id === params.id) || mockAppointments[0];
 
@@ -32,7 +34,7 @@ export default function AppointmentDetail() {
     <DashboardLayout
       navigation={patientNavigation}
       role="patient"
-      userName="John Smith"
+      userName={patientName}
       headerTitle="Appointment Details"
       showSearch={false}
     >

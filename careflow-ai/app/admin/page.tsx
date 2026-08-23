@@ -8,9 +8,11 @@ import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { adminNavigation } from '@/lib/navigation';
 import { mockDoctors, mockAppointments, mockLeaveRequests, mockPatients } from '@/lib/mock-data';
+import { getDemoAdminName } from '@/lib/config/demo-identity';
 import { Users, Calendar, Clock, TrendingUp, Activity, XCircle, CheckCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
+  const adminName = getDemoAdminName();
   const pendingLeaves = mockLeaveRequests.filter(l => l.status === 'pending').length;
   const todayAppointments = mockAppointments.filter(a => 
     a.status === 'scheduled' || a.status === 'confirmed'
@@ -22,7 +24,7 @@ export default function AdminDashboard() {
     <DashboardLayout
       navigation={adminNavigation}
       role="admin"
-      userName="Admin User"
+      userName={adminName}
       headerTitle="Admin Dashboard"
     >
       {/* Welcome Header */}

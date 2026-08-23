@@ -9,10 +9,12 @@ import Button from '@/components/ui/Button';
 import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { doctorNavigation } from '@/lib/navigation';
 import { mockAppointments, mockPatients } from '@/lib/mock-data';
+import { getDemoDoctorName } from '@/lib/config/demo-identity';
 import { Calendar, Clock, FileText, AlertTriangle, CheckCircle, Video, Phone, CalendarPlus, Download } from 'lucide-react';
 
 export default function DoctorConsultation() {
   const router = useRouter();
+  const doctorName = getDemoDoctorName();
   const params = useParams();
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
@@ -51,7 +53,7 @@ export default function DoctorConsultation() {
 
   if (consultationComplete && !showPatientSummary) {
     return (
-      <DashboardLayout navigation={doctorNavigation} role="doctor" userName="Dr. Sarah Johnson" headerTitle="Consultation">
+      <DashboardLayout navigation={doctorNavigation} role="doctor" userName={doctorName} headerTitle="Consultation">
         <div className="max-w-2xl mx-auto">
           <Card className="border-2 border-green-200">
             <CardContent className="p-12 text-center">
@@ -69,7 +71,7 @@ export default function DoctorConsultation() {
 
   if (showPatientSummary) {
     return (
-      <DashboardLayout navigation={doctorNavigation} role="doctor" userName="Dr. Sarah Johnson" headerTitle="Patient Summary">
+      <DashboardLayout navigation={doctorNavigation} role="doctor" userName={doctorName} headerTitle="Patient Summary">
         <PageHeader title="Patient-Friendly Summary" subtitle="Share this summary with your patient" />
         
         <div className="max-w-3xl mx-auto space-y-6">
@@ -128,7 +130,7 @@ export default function DoctorConsultation() {
   }
 
   return (
-    <DashboardLayout navigation={doctorNavigation} role="doctor" userName="Dr. Sarah Johnson" headerTitle="Consultation">
+    <DashboardLayout navigation={doctorNavigation} role="doctor" userName={doctorName} headerTitle="Consultation">
       <PageHeader 
         title={`Consultation with ${patient.name}`}
         subtitle={`Appointment ID: ${appointment.id}`}
