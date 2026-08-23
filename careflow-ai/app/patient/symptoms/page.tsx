@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import AppSidebar from '@/components/app/AppSidebar';
-import AppHeader from '@/components/app/AppHeader';
+import DashboardLayout from '@/components/app/DashboardLayout';
 import PageHeader from '@/components/app/PageHeader';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import UrgencyBadge from '@/components/app/UrgencyBadge';
 import { patientNavigation } from '@/lib/navigation';
-import { BrainCircuit, Mic, ChevronRight, ChevronLeft, Loader2, CheckCircle, AlertTriangle, Stethoscope, ArrowRight, X } from 'lucide-react';
+import { BrainCircuit, Mic, ChevronRight, ChevronLeft, CheckCircle, AlertTriangle, Stethoscope } from 'lucide-react';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -20,12 +19,10 @@ const SYMPTOM_CATEGORIES = [
 ];
 
 const DURATION_OPTIONS = ['Less than 1 day', '1-3 days', '4-7 days', '1-2 weeks', '2-4 weeks', 'More than 1 month'];
-
 const SEVERITY_OPTIONS = ['Mild', 'Moderate', 'Severe', 'Very Severe'];
-
 const ADDITIONAL_SYMPTOMS = [
   'Fever', 'Fatigue', 'Nausea', 'Dizziness', 'Headache', 
-  'Cough', 'Shortness of breath', 'Chest pain', 'Nausea', 'Vomiting'
+  'Cough', 'Shortness of breath', 'Chest pain', 'Vomiting'
 ];
 
 const PROMPT_EXAMPLES = [
@@ -34,39 +31,29 @@ const PROMPT_EXAMPLES = [
   "I've been feeling unusually tired and weak lately..."
 ];
 
-const ANALYSIS_MESSAGES = [
-  'Analyzing your symptoms...',
-  'Identifying key health concerns...',
-  'Preparing personalized questions for your doctor...',
-  'Generating care recommendations...'
-];
-
 export default function PatientSymptoms() {
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
-  const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   
-  // Form state
   const [symptomDescription, setSymptomDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [duration, setDuration] = useState('');
   const [severity, setSeverity] = useState('');
   const [additionalSymptoms, setAdditionalSymptoms] = useState<string[]>([]);
-  const [transcript, setTranscript] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
 
   const mockAIResult = {
     urgency: 'medium' as const,
     chiefComplaint: 'Persistent headaches with associated symptoms',
     suggestedSpecialty: 'Neurology',
-    summary: 'Based on your symptoms of persistent headaches accompanied by nausea and light sensitivity, this may indicate migraine or tension headaches. The duration of 3 days and moderate severity suggest medical evaluation is recommended.',
+    summary: 'Based on your symptoms of persistent headaches accompanied by nausea and light sensitivity, this may indicate migraine or tension headaches.',
     questionsForDoctor: [
       'Do the headaches occur at a specific time of day?',
       'Have you noticed any triggers like certain foods or stress?',
       'Is there any family history of migraines or headaches?'
     ],
-    recommendedAction: 'Schedule consultation with a neurologist within 1-2 weeks for proper diagnosis and treatment plan.'
+    recommendedAction: 'Schedule consultation with a neurologist within 1-2 weeks.'
   };
 
   const toggleAdditionalSymptom = (symptom: string) => {
@@ -102,7 +89,6 @@ export default function PatientSymptoms() {
     setDuration('');
     setSeverity('');
     setAdditionalSymptoms([]);
-    setTranscript('');
     setIsRecording(false);
   };
 
@@ -115,7 +101,7 @@ export default function PatientSymptoms() {
           </div>
           <div>
             <CardTitle>Describe Your Symptoms</CardTitle>
-            <p className="text-sm text-slate-500">Tell us what you're experiencing</p>
+            <p className="text-sm text-slate-500">Tell us what you&apos;re experiencing</p>
           </div>
         </div>
       </CardHeader>
@@ -127,16 +113,14 @@ export default function PatientSymptoms() {
           <textarea
             value={symptomDescription}
             onChange={(e) => setSymptomDescription(e.target.value)}
-            placeholder={PROMPT_EXAMPLES[Math.floor(Math.random() * PROMPT_EXAMPLES.length)]}
-            rows={6}
+            placeholder={PROMPT_EXAMPLES[0]}
+            rows={5}
             className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-3">
-            Symptom Category
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-3">Symptom Category</label>
           <div className="flex flex-wrap gap-2">
             {SYMPTOM_CATEGORIES.map((category) => (
               <button
@@ -183,9 +167,7 @@ export default function PatientSymptoms() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-3">
-            How long have you had these symptoms?
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-3">How long have you had these symptoms?</label>
           <div className="grid grid-cols-2 gap-2">
             {DURATION_OPTIONS.map((option) => (
               <button
@@ -193,7 +175,7 @@ export default function PatientSymptoms() {
                 onClick={() => setDuration(option)}
                 className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   duration === option
-                    ? 'bg-purple-600 text-white border-purple-600'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-white border border-slate-200 text-slate-700 hover:border-purple-300'
                 }`}
               >
@@ -204,9 +186,7 @@ export default function PatientSymptoms() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-3">
-            How severe are your symptoms?
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-3">How severe are your symptoms?</label>
           <div className="grid grid-cols-2 gap-2">
             {SEVERITY_OPTIONS.map((option) => (
               <button
@@ -214,7 +194,7 @@ export default function PatientSymptoms() {
                 onClick={() => setSeverity(option)}
                 className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   severity === option
-                    ? 'bg-purple-600 text-white border-purple-600'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-white border border-slate-200 text-slate-700 hover:border-purple-300'
                 }`}
               >
@@ -225,9 +205,7 @@ export default function PatientSymptoms() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-3">
-            Any additional symptoms? (Optional)
-          </label>
+          <label className="block text-sm font-medium text-slate-700 mb-3">Any additional symptoms? (Optional)</label>
           <div className="flex flex-wrap gap-2">
             {ADDITIONAL_SYMPTOMS.map((symptom) => (
               <button
@@ -235,7 +213,7 @@ export default function PatientSymptoms() {
                 onClick={() => toggleAdditionalSymptom(symptom)}
                 className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
                   additionalSymptoms.includes(symptom)
-                    ? 'bg-purple-100 text-purple-700 border-purple-300'
+                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -294,7 +272,6 @@ export default function PatientSymptoms() {
           </p>
         </div>
 
-        {/* Animated Waveform Placeholder */}
         {isRecording && (
           <div className="flex items-center justify-center gap-1 h-16 bg-slate-50 rounded-lg">
             {[...Array(20)].map((_, i) => (
@@ -310,23 +287,13 @@ export default function PatientSymptoms() {
           </div>
         )}
 
-        {transcript && (
-          <div className="p-4 bg-slate-50 rounded-lg">
-            <p className="text-sm text-slate-600 mb-2">Transcript:</p>
-            <p className="text-sm text-slate-900">{transcript}</p>
-          </div>
-        )}
-
         <div className="flex justify-between">
           <Button variant="outline" onClick={() => setCurrentStep(2)}>
             <ChevronLeft size={18} className="mr-2" />
             Back
           </Button>
-          <Button
-            onClick={startAnalysis}
-            className="min-w-[120px]"
-          >
-            Analyze
+          <Button onClick={startAnalysis} className="min-w-[120px]">
+            Analyse
             <BrainCircuit size={18} className="ml-2" />
           </Button>
         </div>
@@ -345,7 +312,10 @@ export default function PatientSymptoms() {
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            {ANALYSIS_MESSAGES[Math.floor(analysisProgress / 25)] || ANALYSIS_MESSAGES[0]}
+            {analysisProgress < 25 ? 'Analyzing your symptoms...' :
+             analysisProgress < 50 ? 'Identifying key health concerns...' :
+             analysisProgress < 75 ? 'Preparing questions for your doctor...' :
+             'Generating care recommendations...'}
           </h2>
 
           <div className="w-full max-w-md bg-slate-200 rounded-full h-2 mb-4">
@@ -386,7 +356,7 @@ export default function PatientSymptoms() {
             <p className="text-slate-700">{mockAIResult.chiefComplaint}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <h4 className="font-semibold text-slate-900 mb-1">Suggested Specialty</h4>
               <p className="text-blue-700 font-medium">{mockAIResult.suggestedSpecialty}</p>
@@ -426,11 +396,16 @@ export default function PatientSymptoms() {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/patient/doctors" className="flex-1">
               <Button className="w-full">
                 <Stethoscope size={18} className="mr-2" />
                 Find Recommended Doctor
+              </Button>
+            </Link>
+            <Link href="/patient/booking" className="flex-1">
+              <Button variant="outline" className="w-full">
+                Book Appointment
               </Button>
             </Link>
             <Button variant="outline" onClick={resetForm}>
@@ -443,63 +418,46 @@ export default function PatientSymptoms() {
   );
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <AppSidebar navigation={patientNavigation} role="patient" userName="John Smith" />
-      
-      <div className="flex-1 ml-64">
-        <AppHeader title="AI Symptom Check">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700 transition-colors"
-            >
-              {language === 'en' ? '🇺🇸 English' : '🇮🇳 हिंदी'}
-            </button>
-          </div>
-        </AppHeader>
-        
-        <main className="p-6 pt-20">
-          <div className="max-w-3xl mx-auto">
-            <PageHeader 
-              title="AI Symptom Analysis"
-              subtitle="Describe your symptoms and get AI-powered health insights"
-            />
+    <DashboardLayout
+      navigation={patientNavigation}
+      role="patient"
+      userName="John Smith"
+      headerTitle="AI Symptom Check"
+    >
+      <div className="max-w-3xl mx-auto">
+        <PageHeader 
+          title="AI Symptom Analysis"
+          subtitle="Describe your symptoms and get AI-powered health insights"
+        />
 
-            {/* Progress Steps */}
-            <div className="flex items-center justify-between mb-8">
-              {[1, 2, 3, 4, 5].map((step) => (
-                <div key={step} className="flex items-center">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
-                      step === currentStep
-                        ? 'bg-blue-600 text-white'
-                        : step < currentStep
-                        ? 'bg-green-500 text-white'
-                        : 'bg-slate-200 text-slate-500'
-                    }`}
-                  >
-                    {step < currentStep ? <CheckCircle size={20} /> : step}
-                  </div>
-                  {step < 5 && (
-                    <div
-                      className={`w-16 h-1 mx-2 ${
-                        step < currentStep ? 'bg-green-500' : 'bg-slate-200'
-                      }`}
-                    />
-                  )}
-                </div>
-              ))}
+        {/* Progress Steps */}
+        <div className="flex items-center justify-between mb-8">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div key={step} className="flex items-center">
+              <div
+                className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-medium text-sm ${
+                  step === currentStep
+                    ? 'bg-blue-600 text-white'
+                    : step < currentStep
+                    ? 'bg-green-500 text-white'
+                    : 'bg-slate-200 text-slate-500'
+                }`}
+              >
+                {step < currentStep ? <CheckCircle size={18} /> : step}
+              </div>
+              {step < 5 && (
+                <div className={`w-6 sm:w-16 h-1 mx-1 sm:mx-2 ${step < currentStep ? 'bg-green-500' : 'bg-slate-200'}`} />
+              )}
             </div>
+          ))}
+        </div>
 
-            {/* Step Content */}
-            {currentStep === 1 && renderStep1()}
-            {currentStep === 2 && renderStep2()}
-            {currentStep === 3 && renderStep3()}
-            {currentStep === 4 && renderStep4()}
-            {currentStep === 5 && renderStep5()}
-          </div>
-        </main>
+        {currentStep === 1 && renderStep1()}
+        {currentStep === 2 && renderStep2()}
+        {currentStep === 3 && renderStep3()}
+        {currentStep === 4 && renderStep4()}
+        {currentStep === 5 && renderStep5()}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

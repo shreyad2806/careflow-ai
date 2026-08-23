@@ -26,7 +26,7 @@ export const patientNavigation: RoleNavigation = {
     {
       label: 'Care Timeline',
       href: '/patient/timeline',
-      icon: 'Timeline',
+      icon: 'ListOrdered',
     },
   ],
 };
