@@ -18,6 +18,8 @@ export interface Doctor {
   nextAvailable: string;
   location: string;
   consultationFee: number;
+  languages: string[];
+  description: string;
 }
 
 export interface Patient {

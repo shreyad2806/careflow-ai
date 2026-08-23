@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { Star, MapPin, Calendar, DollarSign, Languages, Clock } from 'lucide-react';
 import { Doctor } from '@/lib/types';
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -7,15 +7,16 @@ import Button from '@/components/ui/Button';
 interface DoctorCardProps {
   doctor: Doctor;
   onBook?: (id: string) => void;
+  onViewProfile?: (id: string) => void;
 }
 
-export default function DoctorCard({ doctor, onBook }: DoctorCardProps) {
+export default function DoctorCard({ doctor, onBook, onViewProfile }: DoctorCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start gap-4 mb-4">
-          <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-bold text-slate-600">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-2xl font-bold text-white">
               {doctor.name.split(' ').map(n => n[0]).join('')}
             </span>
           </div>
@@ -30,6 +31,8 @@ export default function DoctorCard({ doctor, onBook }: DoctorCardProps) {
           </div>
         </div>
 
+        <p className="text-sm text-slate-600 mb-4 line-clamp-2">{doctor.description}</p>
+
         <div className="space-y-2 mb-4">
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <MapPin size={16} />
@@ -43,6 +46,14 @@ export default function DoctorCard({ doctor, onBook }: DoctorCardProps) {
             <DollarSign size={16} />
             <span>${doctor.consultationFee} consultation</span>
           </div>
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Clock size={16} />
+            <span>Next: {doctor.nextAvailable}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Languages size={16} />
+            <span className="line-clamp-1">{doctor.languages.join(', ')}</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 mb-4">
@@ -54,14 +65,24 @@ export default function DoctorCard({ doctor, onBook }: DoctorCardProps) {
           ))}
         </div>
 
-        <Button 
-          variant="primary" 
-          size="sm" 
-          className="w-full"
-          onClick={() => onBook?.(doctor.id)}
-        >
-          Book Appointment
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1"
+            onClick={() => onViewProfile?.(doctor.id)}
+          >
+            View Profile
+          </Button>
+          <Button 
+            variant="primary" 
+            size="sm" 
+            className="flex-1"
+            onClick={() => onBook?.(doctor.id)}
+          >
+            Book
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
