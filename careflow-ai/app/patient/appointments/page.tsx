@@ -1,0 +1,94 @@
+'use client';
+
+import React, { useState } from 'react';
+import AppSidebar from '@/components/app/AppSidebar';
+import AppHeader from '@/components/app/AppHeader';
+import PageHeader from '@/components/app/PageHeader';
+import AppointmentCard from '@/components/app/AppointmentCard';
+import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { patientNavigation } from '@/lib/navigation';
+import { mockAppointments } from '@/lib/mock-data';
+import { Calendar, Clock, Filter } from 'lucide-react';
+import Link from 'next/link';
+
+export default function PatientAppointments() {
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+
+  const upcomingAppointments = mockAppointments.filter(a => 
+    a.status === 'scheduled' || a.status === 'confirmed'
+  );
+
+  const pastAppointments = mockAppointments.filter(a => 
+    a.status === 'completed' || a.status === 'cancelled'
+  );
+
+  const filteredAppointments = filter === 'all' 
+    ? mockAppointments 
+    : filter === 'upcoming' 
+    ? upcomingAppointments 
+    : pastAppointments;
+
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <AppSidebar navigation={patientNavigation} role="patient" userName="John Smith" />
+      
+      <div className="flex-1 ml-64">
+        <AppHeader title="My Appointments" />
+        
+        <main className="p-6 pt-20">
+          <PageHeader 
+            title="My Appointments"
+            subtitle="Manage your upcoming and past appointments"
+          />
+          
+          <div className="mb-6 flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1">
+              {(['all', 'upcoming', 'past'] as const).map((filterType) => (
+                <button
+                  key={filterType}
+                  onClick={() => setFilter(filterType)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-colors ${
+                    filter === filterType
+                      ? 'bg-blue-600 text-white'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {filterType}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filteredAppointments.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAppointments.map((appointment) => (
+                <Link key={appointment.id} href={`/patient/appointments/${appointment.id}`}>
+                  <AppointmentCard 
+                    appointment={appointment}
+                    onViewDetails={(id) => console.log('View details:', id)}
+                  />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Calendar size={48} className="text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No appointments found</h3>
+                <p className="text-slate-600 mb-6">
+                  {filter === 'upcoming' ? 'You have no upcoming appointments.' : 
+                   filter === 'past' ? 'You have no past appointments.' : 
+                   'You have no appointments yet.'}
+                </p>
+                <Link href="/patient/booking">
+                  <Button>Book an Appointment</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
