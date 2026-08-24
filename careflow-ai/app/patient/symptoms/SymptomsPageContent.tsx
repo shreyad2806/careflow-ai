@@ -613,7 +613,10 @@ export default function SymptomsPageContent({ patientId }: Props) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/patient/doctors" className="flex-1">
+              <Link
+                href={`/patient/doctors?specialty=${encodeURIComponent(analysisResult.suggestedSpecialty)}`}
+                className="flex-1"
+              >
                 <Button className="w-full">
                   <Stethoscope size={18} className="mr-2" />
                   Find Recommended Doctor

@@ -26,7 +26,7 @@ CareFlow AI addresses all three with a validated AI pipeline, a PostgreSQL-enfor
 
 - **Database-level concurrency protection** — Race conditions prevented by PostgreSQL `FOR UPDATE` locks and constraint triggers, not application code
 - **Validated AI pipeline** — Every LLM response passes Zod schema validation before reaching the client; invalid output triggers controlled fallback
-- **Provider abstraction** — Swappable AI providers (mock, OpenAI) with zero changes to validation or persistence layers
+- **Provider abstraction** — Swappable AI providers (mock, OpenAI, Gemini) with zero changes to validation or persistence layers
 - **Atomic booking confirmation** — Hold → verify → confirm → delete happens in a single PostgreSQL transaction
 - **Cancel-after-confirm rescheduling** — Old appointment only cancelled after new booking succeeds, preventing patient slot loss
 
@@ -37,7 +37,7 @@ CareFlow AI addresses all three with a validated AI pipeline, a PostgreSQL-enfor
 | Feature | Status | Description |
 |---------|--------|-------------|
 | AI Symptom Analysis | ✅ | Natural language → structured triage (urgency, specialty, summary, questions) |
-| AI Provider Abstraction | ✅ | Mock + OpenAI providers with env-based selection |
+| AI Provider Abstraction | ✅ | Mock + OpenAI + Gemini providers with env-based selection |
 | AI Output Validation | ✅ | Zod schemas normalize and validate all AI output |
 | AI Analysis Persistence | ✅ | Validated analyses saved to Supabase `ai_analyses` |
 | Doctor Matching | ✅ | AI analysis → ranked specialist matching with availability |
@@ -140,7 +140,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete architecture docum
 | Language | TypeScript 5 |
 | Database | Supabase (PostgreSQL) |
 | Validation | Zod 4 |
-| AI Provider | OpenAI SDK 7 (mock by default) |
+| AI Provider | OpenAI SDK 7 + Google GenAI SDK 2 (mock by default) |
 | Testing | Vitest 4 |
 | Icons | Lucide React |
 
@@ -191,9 +191,11 @@ Open **http://localhost:3000**.
 | `NEXT_PUBLIC_SUPABASE_URL` | **Yes** | — | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Yes** | — | Supabase anonymous key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Yes** | — | Supabase service role key (server only) |
-| `AI_PROVIDER` | No | auto | `mock` or `openai` |
-| `OPENAI_API_KEY` | No | — | Required only for real AI |
+| `AI_PROVIDER` | No | auto | `mock`, `openai`, or `gemini` |
+| `OPENAI_API_KEY` | No | — | Required for OpenAI provider |
 | `OPENAI_MODEL` | No | `gpt-4o-mini` | OpenAI model to use |
+| `GEMINI_API_KEY` | No | — | Required for Gemini provider |
+| `GEMINI_MODEL` | No | `gemini-3.6-flash` | Gemini model to use |
 
 See [`.env.example`](.env.example) for a template.
 
@@ -231,9 +233,13 @@ By default, CareFlow AI uses a **mock provider** that requires no API key. The m
 To use a real LLM:
 
 ```bash
-# In .env.local
+# Option A: OpenAI
 AI_PROVIDER=openai
 OPENAI_API_KEY=sk-your-key-here
+
+# Option B: Google Gemini
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-key-here
 ```
 
 The provider is selected at startup by `lib/ai/provider-factory.ts`. All output passes through Zod validation regardless of provider.
@@ -316,7 +322,7 @@ CareFlow AI is a **demonstration platform** for evaluating AI-assisted healthcar
 - Hindi language AI analysis output
 - Patient analysis history view
 - Voice input for symptom description
-- Google Calendar integration
+- Multi-provider concurrent fallback
 - Multi-doctor demo seed data
 
 ---

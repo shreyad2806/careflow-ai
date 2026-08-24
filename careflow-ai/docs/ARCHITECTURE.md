@@ -24,6 +24,7 @@ graph TB
         PF[Provider Factory]
         MOCK[Mock Provider]
         OPENAI[OpenAI Provider]
+        GEMINI[Gemini Provider]
         VAL[Zod Validation]
     end
 
@@ -40,6 +41,7 @@ graph TB
     API --> PF
     PF --> MOCK
     PF --> OPENAI
+    PF --> GEMINI
     SVC --> DB
     SVC --> AUTH
     SVC --> RPC
@@ -67,7 +69,7 @@ sequenceDiagram
     UI->>Route: POST /api/ai/symptoms/analyze
     Route->>Route: Validate request body (Zod)
     Route->>Factory: getProvider()
-    Factory-->>Route: MockSymptomProvider | OpenAIProvider
+    Factory-->>Route: MockSymptomProvider | OpenAIProvider | GeminiSymptomProvider
     Route->>Provider: analyze({ symptoms, language })
     Provider-->>Route: Raw JSON response
     Route->>Schema: RawAnalysisSchema.validate()
@@ -215,11 +217,14 @@ graph TD
     ENV[Environment Variables] --> FF[Provider Factory]
     FF -->|AI_PROVIDER=mock| MOCK[MockSymptomProvider]
     FF -->|AI_PROVIDER=openai + key| OAI[OpenAIProvider]
+    FF -->|AI_PROVIDER=gemini + key| GEM[GeminiSymptomProvider]
     FF -->|No key + no flag| MOCK
     FF -->|openai + no key| MOCK
+    FF -->|gemini + no key| MOCK
 
     MOCK -->|Deterministic keyword match| R[Raw JSON]
-    OAI -->|OpenAI API call + timeout| R
+    OAI -->|OpenAI API + JSON mode| R
+    GEM -->|Gemini API + responseJsonSchema| R
     R --> VAL[Zod Schema Validation]
     VAL -->|Valid| RESULT[Normalized Result]
     VAL -->|Invalid| FALLBACK[Controlled Error]
@@ -228,10 +233,12 @@ graph TD
         PI[SymptomAIProvider interface]
         PI --> MOCK
         PI --> OAI
+        PI --> GEM
     end
 
     style MOCK fill:#d4edda
     style OAI fill:#cce5ff
+    style GEM fill:#e8f5e9
     style FALLBACK fill:#f8d7da
 ```
 
@@ -352,7 +359,7 @@ erDiagram
 | Database | Supabase (PostgreSQL) | — |
 | Auth | Supabase Auth | — |
 | Validation | Zod | 4.4.3 |
-| AI Provider | OpenAI SDK | 7.5.0 |
+| AI Provider | OpenAI SDK + Google GenAI SDK | 7.5.0 + 2.18.0 |
 | Icons | Lucide React | 1.33.0 |
 | Testing | Vitest | 4.1.11 |
 
@@ -388,6 +395,7 @@ careflow-ai/
 │   │   ├── provider.ts                    # SymptomAIProvider interface
 │   │   ├── mock-provider.ts               # Deterministic mock provider
 │   │   ├── openai-provider.ts             # OpenAI provider
+│   │   ├── gemini-provider.ts             # Google Gemini provider
 │   │   ├── provider-factory.ts            # Env-based provider selection
 │   │   ├── schema.ts                      # Zod schemas + prompts
 │   │   ├── types.ts                       # AI analysis types
@@ -470,4 +478,4 @@ careflow-ai/
 
 4. **Persistence failure does not block AI response.** If the database is unavailable when saving an AI analysis, the response is still returned to the client with `analysisId: null`. The analysis is still clinically useful.
 
-5. **Provider abstraction.** The AI provider interface allows swapping between mock, OpenAI, or any future provider with zero changes to the API route or validation layer.
+5. **Provider abstraction.** The AI provider interface allows swapping between mock, OpenAI, Gemini, or any future provider with zero changes to the API route or validation layer.

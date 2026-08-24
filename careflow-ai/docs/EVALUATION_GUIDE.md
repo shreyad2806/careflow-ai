@@ -113,6 +113,8 @@ To verify the app uses real Supabase data (not just mock data):
 
 ## Switching from Mock AI to Real AI
 
+### Option A: OpenAI
+
 1. Get an OpenAI API key from https://platform.openai.com/api-keys
 
 2. Add to `.env.local`:
@@ -121,17 +123,33 @@ To verify the app uses real Supabase data (not just mock data):
    OPENAI_API_KEY=sk-your-key-here
    ```
 
-3. Restart the dev server:
-   ```bash
-   npm run dev
-   ```
+3. Restart the dev server.
 
 4. The terminal will show:
    ```
    [AIAnalysis] [ProviderFactory] ✅ Provider: openai (model=gpt-4o-mini)
    ```
 
-5. All subsequent symptom analyses will use the real OpenAI API.
+### Option B: Google Gemini
+
+1. Get a Gemini API key from https://aistudio.google.com/apikey
+
+2. Add to `.env.local`:
+   ```bash
+   AI_PROVIDER=gemini
+   GEMINI_API_KEY=your-gemini-key-here
+   ```
+
+3. Restart the dev server.
+
+4. The terminal will show:
+   ```
+   [AIAnalysis] [ProviderFactory] ✅ Provider: gemini (model=gemini-3.6-flash)
+   ```
+
+5. All subsequent symptom analyses will use the real Gemini API.
+
+Both providers produce the same validated output structure. The Zod validation layer normalizes and validates all responses regardless of provider.
 
 ---
 
