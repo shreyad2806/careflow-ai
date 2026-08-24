@@ -331,3 +331,37 @@ export function mapDoctorToFrontend(
     email: profile.email,
   };
 }
+
+// ============================================================
+// Booking Engine Function Return Types
+// ============================================================
+
+export interface SlotAvailabilityResult {
+  available: boolean;
+  error?: string;
+}
+
+export interface AcquireHoldResult {
+  success: boolean;
+  hold_id?: string;
+  error?: string;
+}
+
+export interface ConfirmBookingResult {
+  success: boolean;
+  appointment_id?: string;
+  error?: string;
+}
+
+export interface CancelAppointmentResult {
+  success: boolean;
+  appointment_id?: string;
+  error?: string;
+  current_status?: string;
+}
+
+export interface RescheduleResult {
+  success: boolean;
+  hold_id?: string;
+  error?: string;
+}
