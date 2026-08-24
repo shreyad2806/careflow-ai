@@ -334,7 +334,7 @@ describe('MockSymptomProvider', () => {
     expect(result.data.suggested_specialty).toBe('Cardiology');
   });
 
-  it('adds language note for non-English', async () => {
+  it('returns Hindi content when language=hi', async () => {
     const result = await provider.analyze({
       symptoms: { description: 'headache' },
       language: 'hi',
@@ -342,7 +342,21 @@ describe('MockSymptomProvider', () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.data.patient_summary).toContain('Patient preferred language: hi');
+    // Hindi headache category returns Hindi text
+    expect(result.data.patient_summary).toContain('सिरदर्द');
+    expect(result.data.suggested_specialty).toBe('Neurology');
+  });
+
+  it('falls back to language note for unsupported category in Hindi', async () => {
+    const result = await provider.analyze({
+      symptoms: { description: 'tooth pain' },
+      language: 'hi',
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // Fallback category has no Hindi translation, so gets language note
+    expect(result.data.patient_summary).toContain('हिंदी');
   });
 });
 

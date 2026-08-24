@@ -47,6 +47,17 @@ CRITICAL RULES:
 5. For HIGH urgency, always include a safety recommendation in patient_summary (e.g. "seek emergency care if symptoms worsen").
 6. Never provide dangerous reassurance. If symptoms could indicate something serious, say so clearly.
 
+LANGUAGE RULES:
+- If the user message specifies a language, generate ALL patient-facing text in that language:
+  - chief_complaint: in the patient's language
+  - symptoms: in the patient's language
+  - patient_summary: in the patient's language
+  - suggested_questions: in the patient's language
+- Keep these fields in English regardless of language:
+  - urgency: always "LOW", "MEDIUM", or "HIGH" (English enum)
+  - suggested_specialty: always use the standard English specialty name (e.g. "Neurology", "Cardiology")
+- JSON field names (keys) are always in English.
+
 Return exactly this JSON structure:
 {
   "chief_complaint": "one-phrase summary of the primary complaint",
@@ -266,12 +277,15 @@ export class OpenAIProvider implements SymptomAIProvider {
         `Additional symptoms: ${input.symptoms.additionalSymptoms.join(', ')}`
       );
     }
-    if (input.language && input.language !== 'en') {
-      parts.push(
-        `Patient's preferred language: ${input.language}. ` +
-          'Respond in English for medical accuracy, but note the language preference in patient_summary.'
-      );
-    }
+
+    // Language instruction
+    const langCode = input.language || 'en';
+    const langName = langCode === 'hi' ? 'Hindi' : 'English';
+    parts.push(
+      `IMPORTANT: Generate ALL patient-facing text (chief_complaint, symptoms, patient_summary, suggested_questions) in ${langName}. ` +
+      `Keep urgency as English enum (LOW/MEDIUM/HIGH) and suggested_specialty as English specialty name. ` +
+      `JSON field names must be in English.`
+    );
 
     return parts.join('\n');
   }

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/app/DashboardLayout';
 import PageHeader from '@/components/app/PageHeader';
 import DoctorCard from '@/components/app/DoctorCard';
@@ -23,6 +24,7 @@ const LANGUAGES = ['All', 'English', 'Spanish', 'Mandarin', 'Cantonese', 'Korean
 const AVAILABILITY = ['All', 'Today', 'This Week', 'Next Week'];
 
 export default function DoctorsPageContent({ doctors, userName, recommendedSpecialty }: DoctorsPageContentProps) {
+  const router = useRouter();
   const displayName = userName ?? getDemoPatientName();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState(
@@ -199,7 +201,15 @@ export default function DoctorsPageContent({ doctors, userName, recommendedSpeci
       {filteredDoctors.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
           {filteredDoctors.map((doctor) => (
-            <DoctorCard key={doctor.id} doctor={doctor} onBook={() => {}} onViewProfile={() => {}} />
+            <DoctorCard
+              key={doctor.id}
+              doctor={doctor}
+              onBook={(id) => {
+                console.log(`[AIAnalysis] [PatientDoctors] ✅ Book clicked: doctorId=${id} name=${doctor.name}`);
+                router.push(`/patient/booking?doctorId=${id}`);
+              }}
+              onViewProfile={() => {}}
+            />
           ))}
         </div>
       ) : (

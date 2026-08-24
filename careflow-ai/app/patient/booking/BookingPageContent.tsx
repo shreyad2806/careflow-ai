@@ -36,6 +36,8 @@ interface BookingPageContentProps {
     reason: string;
     urgency: 'low' | 'medium' | 'high' | 'critical';
   } | null;
+  /** Doctor ID from URL search params — pre-selects this doctor in the list. */
+  preselectedDoctorId?: string;
 }
 
 // ============================================================
@@ -92,15 +94,23 @@ export default function BookingPageContent({
   patientId,
   doctors,
   rescheduleAppointment,
+  preselectedDoctorId,
 }: BookingPageContentProps) {
   const router = useRouter();
   const availableDates = getNext7Days();
   const isReschedule = !!rescheduleAppointment;
 
-  // --- Pre-select doctor for reschedule mode ---
+  // --- Pre-select doctor: reschedule > URL param > first in list ---
   const initialDoctor = isReschedule
     ? doctors.find(d => d.id === rescheduleAppointment.doctorId) ?? doctors[0] ?? null
+    : preselectedDoctorId
+    ? doctors.find(d => d.id === preselectedDoctorId) ?? doctors[0] ?? null
     : doctors[0] ?? null;
+
+  // Dev diagnostic for pre-selected doctor
+  if (preselectedDoctorId && initialDoctor) {
+    console.log(`[Booking] ✅ Pre-selected doctor from URL: ${initialDoctor.name} (${initialDoctor.id})`);
+  }
 
   // --- State ---
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(initialDoctor);

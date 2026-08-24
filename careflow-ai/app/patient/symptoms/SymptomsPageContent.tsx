@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { getDemoPatientName } from '@/lib/config/demo-identity';
+import { useLanguage } from '@/lib/LanguageContext';
 
 // ============================================================
 // Types
@@ -76,6 +77,7 @@ const PROMPT_EXAMPLES = [
 
 export default function SymptomsPageContent({ patientId }: Props) {
   const patientName = getDemoPatientName();
+  const { language } = useLanguage();
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -112,7 +114,7 @@ export default function SymptomsPageContent({ patientId }: Props) {
         duration: duration || undefined,
         severity: severity || undefined,
         additionalSymptoms: additionalSymptoms.length > 0 ? additionalSymptoms : undefined,
-        language: 'en',
+        language: language || 'en',
         patientId,
       }),
       signal: controller.signal,
