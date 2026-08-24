@@ -29,15 +29,32 @@ export async function confirmAppointment(
 ): Promise<BookingResult> {
   const result = await confirmBooking(holdId, patientId, reason, undefined, urgency);
 
-  // --- Fire-and-forget: dispatch notification after successful booking ---
+  // --- Fire-and-forget: dispatch notification AND calendar sync after successful booking ---
   if (result.ok) {
     dispatchBookingNotification(result.appointmentId, patientId).catch((err) => {
       // Notification failure must never affect booking success
       console.error('[Booking] Notification dispatch failed (non-blocking):', err);
     });
+    syncCalendarOnConfirm(result.appointmentId).catch((err) => {
+      // Calendar sync failure must never affect booking success
+      console.error('[Booking] Calendar sync failed (non-blocking):', err);
+    });
   }
 
   return result;
+}
+
+/**
+ * Sync calendar events for a confirmed appointment.
+ * Fire-and-forget: errors are caught and logged, never thrown.
+ */
+async function syncCalendarOnConfirm(appointmentId: string): Promise<void> {
+  try {
+    const { syncOnAppointmentConfirmed } = await import('@/lib/calendar/calendar-service');
+    await syncOnAppointmentConfirmed(appointmentId);
+  } catch (err) {
+    console.error('[Booking] syncCalendarOnConfirm error:', err);
+  }
 }
 
 /**

@@ -50,6 +50,16 @@ export type Database = {
         Insert: AIAnalysisInsert;
         Update: AIAnalysisUpdate;
       };
+      calendar_sync: {
+        Row: CalendarSync;
+        Insert: CalendarSyncInsert;
+        Update: CalendarSyncUpdate;
+      };
+      oauth_tokens: {
+        Row: OAuthToken;
+        Insert: OAuthTokenInsert;
+        Update: OAuthTokenUpdate;
+      };
     };
     Enums: Record<string, never>;
   };
@@ -304,6 +314,68 @@ export interface AIAnalysisInsert {
 }
 
 export type AIAnalysisUpdate = Partial<AIAnalysisInsert>;
+
+// ============================================================
+// Calendar Sync Types
+// ============================================================
+
+export interface CalendarSync {
+  id: string;
+  appointment_id: string;
+  profile_id: string;
+  provider: 'google' | 'outlook' | 'apple';
+  role: 'patient' | 'doctor';
+  external_event_id: string | null;
+  sync_status: 'pending' | 'synced' | 'failed' | 'deleted';
+  last_sync_error: string | null;
+  synced_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CalendarSyncInsert {
+  id?: string;
+  appointment_id: string;
+  profile_id: string;
+  provider?: 'google' | 'outlook' | 'apple';
+  role: 'patient' | 'doctor';
+  external_event_id?: string | null;
+  sync_status?: 'pending' | 'synced' | 'failed' | 'deleted';
+  last_sync_error?: string | null;
+  synced_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type CalendarSyncUpdate = Partial<CalendarSyncInsert>;
+
+// ============================================================
+// OAuth Token Types (NEVER expose to browser)
+// ============================================================
+
+export interface OAuthToken {
+  id: string;
+  profile_id: string;
+  provider: 'google' | 'outlook' | 'apple';
+  access_token: string;
+  refresh_token: string;
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OAuthTokenInsert {
+  id?: string;
+  profile_id: string;
+  provider?: 'google' | 'outlook' | 'apple';
+  access_token: string;
+  refresh_token: string;
+  expires_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type OAuthTokenUpdate = Partial<OAuthTokenInsert>;
 
 // ============================================================
 // Helper: Map DB status to frontend status

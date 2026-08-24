@@ -29,14 +29,43 @@ export async function cancelAppointment(
 ): Promise<CancelResult> {
   const result = await cancelAppointmentService(appointmentId, patientId);
 
-  // --- Fire-and-forget: dispatch notification after successful cancellation ---
+  // --- Fire-and-forget: dispatch notification AND calendar sync after successful cancellation ---
   if (result.ok) {
     dispatchCancellationNotification(result.appointmentId, patientId).catch((err) => {
       console.error('[Appointment] Cancellation notification failed (non-blocking):', err);
     });
+    syncCalendarOnCancel(result.appointmentId).catch((err) => {
+      console.error('[Appointment] Calendar sync failed (non-blocking):', err);
+    });
   }
 
   return result;
+}
+
+/**
+ * Sync calendar events for a cancelled appointment.
+ * Fire-and-forget: errors are caught and logged, never thrown.
+ */
+async function syncCalendarOnCancel(appointmentId: string): Promise<void> {
+  try {
+    const { syncOnAppointmentCancelled } = await import('@/lib/calendar/calendar-service');
+    await syncOnAppointmentCancelled(appointmentId);
+  } catch (err) {
+    console.error('[Appointment] syncCalendarOnCancel error:', err);
+  }
+}
+
+/**
+ * Sync calendar events for a rescheduled appointment.
+ * Fire-and-forget: errors are caught and logged, never thrown.
+ */
+async function syncCalendarOnReschedule(oldId: string, newId: string): Promise<void> {
+  try {
+    const { syncOnAppointmentRescheduled } = await import('@/lib/calendar/calendar-service');
+    await syncOnAppointmentRescheduled(oldId, newId);
+  } catch (err) {
+    console.error('[Appointment] syncCalendarOnReschedule error:', err);
+  }
 }
 
 /**
@@ -127,7 +156,7 @@ export async function rescheduleAppointment(
   reason?: string,
   urgency: 'low' | 'medium' | 'high' | 'critical' = 'medium'
 ): Promise<RescheduleResult> {
-  return rescheduleAppointmentService(
+  const rescheduleResult = await rescheduleAppointmentService(
     appointmentId,
     patientId,
     newDate,
@@ -136,4 +165,16 @@ export async function rescheduleAppointment(
     reason,
     urgency
   );
+
+  // --- Fire-and-forget: sync calendar after successful reschedule ---
+  if (rescheduleResult.ok) {
+    syncCalendarOnReschedule(
+      rescheduleResult.oldAppointmentId,
+      rescheduleResult.newAppointmentId
+    ).catch((err) => {
+      console.error('[Appointment] Calendar reschedule sync failed (non-blocking):', err);
+    });
+  }
+
+  return rescheduleResult;
 }

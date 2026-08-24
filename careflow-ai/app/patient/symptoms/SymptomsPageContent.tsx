@@ -14,6 +14,7 @@ import {
 import Link from 'next/link';
 import { getDemoPatientName } from '@/lib/config/demo-identity';
 import { useLanguage } from '@/lib/LanguageContext';
+import { useSpeechRecognition } from '@/lib/hooks/useSpeechRecognition';
 
 // ============================================================
 // Types
@@ -87,7 +88,31 @@ export default function SymptomsPageContent({ patientId }: Props) {
   const [duration, setDuration] = useState('');
   const [severity, setSeverity] = useState('');
   const [additionalSymptoms, setAdditionalSymptoms] = useState<string[]>([]);
-  const [isRecording, setIsRecording] = useState(false);
+  // Voice input
+  const speechLang = language === 'hi' ? 'hi-IN' : 'en-IN';
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const {
+    isSupported: speechSupported,
+    isListening,
+    interimTranscript,
+    finalTranscript,
+    error: speechError,
+    start: startListening,
+    stop: stopListening,
+    reset: resetSpeech,
+  } = useSpeechRecognition({
+    language: speechLang,
+    onResult: (transcript) => {
+      // Append final transcript to the symptom description
+      setSymptomDescription((prev) => {
+        const trimmed = prev.trim();
+        return trimmed ? `${trimmed} ${transcript}` : transcript;
+      });
+    },
+    onError: (err) => {
+      setVoiceError(err.message);
+    },
+  });
 
   // Real API state
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -209,7 +234,8 @@ export default function SymptomsPageContent({ patientId }: Props) {
     setDuration('');
     setSeverity('');
     setAdditionalSymptoms([]);
-    setIsRecording(false);
+    resetSpeech();
+    setVoiceError(null);
     setAnalysisResult(null);
     setApiError(null);
     setIsSubmitting(false);
@@ -250,13 +276,59 @@ export default function SymptomsPageContent({ patientId }: Props) {
           <label className="block text-sm font-medium text-slate-700 mb-2">
             What symptoms are you experiencing?
           </label>
-          <textarea
-            value={symptomDescription}
-            onChange={(e) => setSymptomDescription(e.target.value)}
-            placeholder={PROMPT_EXAMPLES[0]}
-            rows={5}
-            className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          />
+          <div className="relative">
+            <textarea
+              value={symptomDescription}
+              onChange={(e) => setSymptomDescription(e.target.value)}
+              placeholder={PROMPT_EXAMPLES[0]}
+              rows={5}
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            />
+            {/* Voice input button inside textarea */}
+            {speechSupported && currentStep === 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (isListening) {
+                    stopListening();
+                  } else {
+                    setVoiceError(null);
+                    startListening();
+                  }
+                }}
+                className={`absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  isListening
+                    ? 'bg-red-500 animate-pulse'
+                    : 'bg-blue-100 hover:bg-blue-200 text-blue-600'
+                }`}
+                title={isListening ? 'Stop listening' : 'Start voice input'}
+              >
+                <Mic size={18} className="text-white" />
+              </button>
+            )}
+          </div>
+          {/* Live interim transcript */}
+          {isListening && interimTranscript && (
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-blue-600 font-medium mb-1">Listening...</p>
+              <p className="text-sm text-slate-700 italic">{interimTranscript}</p>
+            </div>
+          )}
+          {/* Voice error display */}
+          {voiceError && (
+            <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+              <AlertCircle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-amber-800">{voiceError}</p>
+            </div>
+          )}
+          {/* Language hint */}
+          {speechSupported && (
+            <p className="text-xs text-slate-400 mt-1">
+              {language === 'hi'
+                ? '🎤 Voice input available in Hindi (हिंदी)'
+                : '🎤 Voice input available in English (India)'}
+            </p>
+          )}
         </div>
 
         <div>
@@ -397,33 +469,68 @@ export default function SymptomsPageContent({ patientId }: Props) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center py-8">
-          <button
-            onClick={() => setIsRecording(!isRecording)}
-            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
-              isRecording
-                ? 'bg-red-500 animate-pulse'
-                : 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
-            }`}
-          >
-            <Mic size={40} className="text-white" />
-          </button>
-          <p className="mt-4 text-sm text-slate-600">
-            {isRecording ? 'Recording... Tap to stop' : 'Tap to start recording'}
-          </p>
+          {speechSupported ? (
+            <>
+              <button
+                onClick={() => {
+                  if (isListening) {
+                    stopListening();
+                  } else {
+                    setVoiceError(null);
+                    startListening();
+                  }
+                }}
+                className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+                  isListening
+                    ? 'bg-red-500 animate-pulse'
+                    : 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                }`}
+              >
+                <Mic size={40} className="text-white" />
+              </button>
+              <p className="mt-4 text-sm text-slate-600">
+                {isListening ? 'Listening... Tap to stop' : 'Tap to start speaking'}
+              </p>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Mic size={28} className="text-slate-300" />
+              </div>
+              <p className="text-sm text-slate-500">
+                Voice input is not available in this browser.
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                Please type your symptoms instead.
+              </p>
+            </div>
+          )}
         </div>
 
-        {isRecording && (
-          <div className="flex items-center justify-center gap-1 h-16 bg-slate-50 rounded-lg">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-green-500 rounded-full animate-pulse"
-                style={{
-                  height: `${Math.random() * 40 + 10}px`,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
+        {/* Live interim transcript during Step 3 recording */}
+        {isListening && interimTranscript && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-xs text-green-600 font-medium mb-1">🎤 Hearing you...</p>
+            <p className="text-sm text-slate-700 italic">{interimTranscript}</p>
+          </div>
+        )}
+
+        {/* Voice error in Step 3 */}
+        {voiceError && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+            <AlertCircle size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-amber-800">{voiceError}</p>
+          </div>
+        )}
+
+        {/* Transcript preview — shows what was captured */}
+        {finalTranscript && (
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+            <p className="text-xs text-slate-500 font-medium mb-1">Captured text:</p>
+            <p className="text-sm text-slate-700">{finalTranscript}</p>
+            <p className="text-xs text-slate-400 mt-2">
+              This text has been added to your symptom description on Step 1.
+            </p>
           </div>
         )}
 
@@ -431,11 +538,14 @@ export default function SymptomsPageContent({ patientId }: Props) {
           <Button variant="outline" onClick={() => setCurrentStep(2)}>
             <ChevronLeft size={18} className="mr-2" />
             Back
-          </Button>
-          <Button
-            onClick={startAnalysis}
-            disabled={isSubmitting}
-            className="min-w-[120px]"
+          </Button>              <Button
+                onClick={() => {
+                  // Stop any active recording before analysis
+                  if (isListening) stopListening();
+                  startAnalysis();
+                }}
+                disabled={isSubmitting}
+                className="min-w-[120px]"
           >
             {isSubmitting ? (
               <>
