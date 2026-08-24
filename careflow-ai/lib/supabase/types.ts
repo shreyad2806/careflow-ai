@@ -237,9 +237,19 @@ export interface NotificationRow {
   id: string;
   profile_id: string;
   type: 'appointment' | 'medication' | 'system' | 'urgent' | 'info';
+  channel: 'in_app' | 'email' | 'push';
+  status: 'pending' | 'delivered' | 'failed';
+  event_type: string | null;
+  event_id: string | null;
   title: string;
   message: string;
   is_read: boolean;
+  retry_count: number;
+  max_retries: number;
+  last_attempt_at: string | null;
+  next_retry_at: string | null;
+  delivered_at: string | null;
+  failure_reason: string | null;
   created_at: string;
 }
 
@@ -247,9 +257,19 @@ export interface NotificationInsert {
   id?: string;
   profile_id: string;
   type: 'appointment' | 'medication' | 'system' | 'urgent' | 'info';
+  channel?: 'in_app' | 'email' | 'push';
+  status?: 'pending' | 'delivered' | 'failed';
+  event_type?: string | null;
+  event_id?: string | null;
   title: string;
   message: string;
   is_read?: boolean;
+  retry_count?: number;
+  max_retries?: number;
+  last_attempt_at?: string | null;
+  next_retry_at?: string | null;
+  delivered_at?: string | null;
+  failure_reason?: string | null;
   created_at?: string;
 }
 

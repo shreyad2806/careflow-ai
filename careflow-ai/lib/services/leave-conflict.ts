@@ -16,6 +16,7 @@
  */
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { notifyDoctorLeaveConflict } from './notification-service';
 
 // ============================================================
 // Domain types
@@ -302,50 +303,25 @@ async function createLeaveNotifications(
     // Use empty map — notifications will be skipped
   }
 
-  // Create notifications for each affected patient
+  // Create notifications for each affected patient using the notification service
+  // (handles idempotency, retry logic, and delivery state machine)
   let created = 0;
-  const dateRangeText = startDate === endDate
-    ? startDate
-    : `${startDate} to ${endDate}`;
 
   for (const apt of affectedAppointments) {
     const profileId = patientProfileMap.get(apt.patientId);
     if (!profileId) continue;
 
-    // Check for existing notification (deduplication)
-    const { data: existing } = await supabase
-      .from('notifications')
-      .select('id')
-      .eq('profile_id', profileId)
-      .eq('type', 'urgent')
-      .ilike('message', `%${dateRangeText}%`)
-      .ilike('message', `%${doctorName}%`)
-      .limit(1);
+    const result = await notifyDoctorLeaveConflict({
+      patientProfileId: profileId,
+      appointmentId: apt.appointmentId,
+      doctorName,
+      leaveStartDate: startDate,
+      leaveEndDate: endDate,
+      appointmentDate: apt.appointmentDate,
+      appointmentTime: apt.startTime,
+    });
 
-    if (existing && existing.length > 0) {
-      // Notification already exists — skip
-      continue;
-    }
-
-    const reasonText = reason ? ` Reason: ${reason}.` : '';
-    const dateText = apt.appointmentDate === startDate && apt.appointmentDate === endDate
-      ? `on ${apt.appointmentDate}`
-      : `on ${apt.appointmentDate}`;
-
-    const { error } = await supabase
-      .from('notifications')
-      .insert({
-        profile_id: profileId,
-        type: 'urgent',
-        title: 'Doctor Leave — Appointment May Be Affected',
-        message:
-          `${doctorName} will be on leave ${dateRangeText}. ` +
-          `Your appointment ${dateText} at ${apt.startTime} may be affected. ` +
-          `Please contact the clinic to reschedule.${reasonText}`,
-        is_read: false,
-      });
-
-    if (!error) {
+    if (result.ok && !result.idempotent) {
       created++;
     }
   }
