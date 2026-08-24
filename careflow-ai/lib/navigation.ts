@@ -40,8 +40,8 @@ export const doctorNavigation: RoleNavigation = {
       icon: 'LayoutDashboard',
     },
     {
-      label: 'Schedule',
-      href: '/doctor/schedule',
+      label: 'Appointments',
+      href: '/doctor/appointments',
       icon: 'CalendarDays',
     },
     {

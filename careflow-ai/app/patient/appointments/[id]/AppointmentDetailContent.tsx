@@ -289,7 +289,10 @@ export default function AppointmentDetailContent({
             <CardContent className="space-y-3">
               {isCancellable ? (
                 <>
-                  <Button className="w-full">
+                  <Button
+                    className="w-full"
+                    onClick={() => router.push(`/doctor/consultation/${currentAppointment.id}`)}
+                  >
                     <Video size={18} className="mr-2" />
                     Join Consultation
                   </Button>
@@ -315,7 +318,10 @@ export default function AppointmentDetailContent({
                 </>
               ) : currentAppointment.status === 'completed' ? (
                 <>
-                  <Button className="w-full">
+                  <Button
+                    className="w-full"
+                    onClick={() => router.push('/patient/booking')}
+                  >
                     <CheckCircle size={18} className="mr-2" />
                     Book Follow-up
                   </Button>

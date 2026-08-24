@@ -75,11 +75,11 @@ export default function AdminDoctorsContent({ doctors, userName = 'Admin' }: Adm
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  <Edit size={16} className="mr-2" />Edit
+                <Button variant="outline" size="sm" className="flex-1" disabled title="Coming Soon">
+                  <Edit size={16} className="mr-2" />Edit <span className="text-xs text-slate-400">Soon</span>
                 </Button>
-                <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50">
-                  <Trash2 size={16} className="mr-2" />Remove
+                <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50" disabled title="Coming Soon">
+                  <Trash2 size={16} className="mr-2" />Remove <span className="text-xs text-slate-400">Soon</span>
                 </Button>
               </div>
             </CardContent>

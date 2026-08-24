@@ -225,10 +225,10 @@ export default function DoctorConsultation() {
             <CardHeader><CardTitle>Quick Actions</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" className="justify-start"><Video size={18} className="mr-2" />Video Call</Button>
-                <Button variant="outline" className="justify-start"><Phone size={18} className="mr-2" />Audio Call</Button>
-                <Button variant="outline" className="justify-start"><FileText size={18} className="mr-2" />View Records</Button>
-                <Button variant="outline" className="justify-start"><CalendarPlus size={18} className="mr-2" />Follow-up</Button>
+                <Button variant="outline" className="justify-start" disabled title="Coming Soon"><Video size={18} className="mr-2" />Video Call <span className="ml-1 text-xs text-slate-400">Soon</span></Button>
+                <Button variant="outline" className="justify-start" disabled title="Coming Soon"><Phone size={18} className="mr-2" />Audio Call <span className="ml-1 text-xs text-slate-400">Soon</span></Button>
+                <Button variant="outline" className="justify-start" disabled title="Coming Soon"><FileText size={18} className="mr-2" />View Records <span className="ml-1 text-xs text-slate-400">Soon</span></Button>
+                <Button variant="outline" className="justify-start" onClick={() => router.push('/patient/booking')}><CalendarPlus size={18} className="mr-2" />Follow-up</Button>
               </div>
             </CardContent>
           </Card>

@@ -131,7 +131,7 @@ export default function DoctorDashboardContent({ appointments, doctorId = '', us
                 </div>
                 <p className="text-sm text-slate-600 mb-2">Chief complaint: {appointment.reason}</p>
                 <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline">View Summary</Button>
+                  <Button size="sm" variant="outline" disabled title="Coming Soon">View Summary <span className="ml-1 text-xs text-slate-400">Soon</span></Button>
                   <Link href={`/doctor/consultation/${appointment.id}`}><Button size="sm">Start Consultation</Button></Link>
                 </div>
               </div>

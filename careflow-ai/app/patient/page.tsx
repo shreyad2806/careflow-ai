@@ -118,10 +118,12 @@ export default function PatientDashboard() {
                       </span>
                     </div>
                   </div>
-                  <Button>
-                    <Video size={18} className="mr-2" />
-                    {t('dashboard.join')}
-                  </Button>
+                  <Link href={`/patient/appointments/${nextAppointment.id}`}>
+                    <Button>
+                      <Video size={18} className="mr-2" />
+                      {t('dashboard.join')}
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <div className="p-4 bg-slate-50 rounded-lg text-center">

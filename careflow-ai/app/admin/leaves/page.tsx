@@ -117,9 +117,9 @@ export default function AdminLeaves() {
               ))}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Button variant="outline" className="justify-start"><Mail size={18} className="mr-2" />Notify Patients</Button>
-              <Button variant="outline" className="justify-start"><RefreshCw size={18} className="mr-2" />Reschedule</Button>
-              <Button variant="outline" className="justify-start text-red-600 hover:bg-red-50"><XCircle size={18} className="mr-2" />Cancel Appointments</Button>
+              <Button variant="outline" className="justify-start" disabled title="Coming Soon"><Mail size={18} className="mr-2" />Notify Patients <span className="text-xs text-slate-400">Soon</span></Button>
+              <Button variant="outline" className="justify-start" disabled title="Coming Soon"><RefreshCw size={18} className="mr-2" />Reschedule <span className="text-xs text-slate-400">Soon</span></Button>
+              <Button variant="outline" className="justify-start text-red-600 hover:bg-red-50" disabled title="Coming Soon"><XCircle size={18} className="mr-2" />Cancel Appointments <span className="text-xs text-slate-400">Soon</span></Button>
             </div>
             <div className="flex gap-3 pt-4 border-t border-slate-200">
               <Button className="flex-1"><CheckCircle size={18} className="mr-2" />Approve Leave & Apply Actions</Button>

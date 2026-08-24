@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, Sparkles, HeartPulse } from 'lucide-react';
 import Button from './ui/Button';
 
@@ -22,14 +23,18 @@ export default function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button variant="primary" size="lg" className="group">
-              Start Free Trial
-              <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="lg">
-              <HeartPulse size={20} className="mr-2" />
-              Watch Demo
-            </Button>
+            <Link href="/patient/symptoms">
+              <Button variant="primary" size="lg" className="group">
+                Start Free Trial
+                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="/patient">
+              <Button variant="outline" size="lg">
+                <HeartPulse size={20} className="mr-2" />
+                Watch Demo
+              </Button>
+            </Link>
           </div>
           
           <div className="mt-12 flex flex-wrap justify-center gap-8 text-slate-500 text-sm">

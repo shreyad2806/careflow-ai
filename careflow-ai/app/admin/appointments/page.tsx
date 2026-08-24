@@ -133,9 +133,9 @@ export default function AdminAppointments() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">View</Button>
+                        <Button variant="outline" size="sm" disabled title="Coming Soon">View <span className="text-xs text-slate-400">Soon</span></Button>
                         {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
-                          <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50">Cancel</Button>
+                          <Button variant="outline" size="sm" className="text-red-600 hover:bg-red-50" disabled title="Coming Soon">Cancel <span className="text-xs text-slate-400">Soon</span></Button>
                         )}
                       </div>
                     </td>
@@ -166,11 +166,10 @@ export default function AdminAppointments() {
                 </span>
               </div>
               <p className="text-sm text-slate-600 mb-1">Dr. {appointment.doctorName}</p>
-              <p className="text-sm text-slate-600">{appointment.date} at {appointment.time}</p>
-              <div className="mt-3 flex gap-2">
-                <UrgencyBadge urgency={appointment.urgency} />
-                <Button variant="outline" size="sm">View</Button>
-              </div>
+              <p className="text-sm text-slate-600">{appointment.date} at {appointment.time}</p>                <div className="mt-3 flex gap-2">
+                  <UrgencyBadge urgency={appointment.urgency} />
+                  <Button variant="outline" size="sm" disabled title="Coming Soon">View <span className="text-xs text-slate-400">Soon</span></Button>
+                </div>
             </CardContent>
           </Card>
         ))}

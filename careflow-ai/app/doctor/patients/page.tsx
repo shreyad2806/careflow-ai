@@ -103,10 +103,19 @@ export default function DoctorPatients() {
                 )}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <FileText size={16} className="mr-2" />
-                    View Details
-                  </Button>
+                  {latestAppointment ? (
+                    <Link href={`/doctor/consultation/${latestAppointment.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full">
+                        <FileText size={16} className="mr-2" />
+                        View Details
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button variant="outline" size="sm" className="flex-1" disabled>
+                      <FileText size={16} className="mr-2" />
+                      No Appointments
+                    </Button>
+                  )}
                   {latestAppointment && (latestAppointment.status === 'confirmed' || latestAppointment.status === 'scheduled') && (
                     <Link href={`/doctor/consultation/${latestAppointment.id}`} className="flex-1">
                       <Button size="sm" className="w-full">
