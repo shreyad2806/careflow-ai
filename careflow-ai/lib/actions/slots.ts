@@ -24,6 +24,9 @@ export async function fetchAvailableSlots(
   date: string,
   slotDurationMinutes?: number
 ): Promise<SlotGenerationResult> {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[Booking] server: fetchAvailableSlots called for doctor=${doctorId} date=${date}`);
+  }
   return generateAvailableSlots(doctorId, date, slotDurationMinutes);
 }
 

@@ -48,8 +48,12 @@ const getNext7Days = () => {
   for (let i = 0; i < 7; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
+    // Use local date components to avoid UTC shift from toISOString()
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     days.push({
-      date: date.toISOString().split('T')[0],
+      date: `${year}-${month}-${day}`,
       display: date.toLocaleDateString('en-US', {
         weekday: 'short',
         month: 'short',
@@ -136,6 +140,12 @@ export default function BookingPageContent({
       );
 
       if (result.ok) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[Booking] doctorId: ${selectedDoctor.id}`);
+          console.log(`[Booking] selectedDate: ${selectedDate}`);
+          console.log(`[Booking] generatedSlotCount: ${result.slots.length}`);
+          console.log('[Booking] source: Supabase');
+        }
         setSlots(result.slots);
         setSlotsError(null);
       } else {
